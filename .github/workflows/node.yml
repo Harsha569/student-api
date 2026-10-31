@@ -10,4 +10,4 @@ jobs:
         with:
           node-version: '20'
       - run: npm install
-      - run: npm node --check server.js
+      - run: node --check server.js
