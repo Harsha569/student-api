@@ -1,0 +1,201 @@
+STUDENT API - COMMAND GUIDE
+============================
+
+Open PowerShell and change to the project folder:
+
+cd "D:\harsha\devops record files\student-api"
+
+
+1. INSTALL AND RUN THE API DIRECTLY
+-----------------------------------
+
+npm install
+node server.js
+
+Test in a browser or Postman:
+
+http://localhost:3000/students
+
+Stop the server with Ctrl+C.
+
+
+2. RUN PYTEST API TESTS
+-----------------------
+
+Install the Python test packages once:
+
+python -m pip install pytest requests
+
+Start the Node API in one PowerShell window:
+
+node server.js
+
+Run the tests from a second PowerShell window:
+
+python -m pytest -q test_api.py
+
+Expected result:
+
+1 passed
+
+
+3. BUILD AND RUN WITH DOCKER
+----------------------------
+
+Build the image:
+
+docker build -f DockerFile -t student-api:latest .
+
+Run the container:
+
+docker run --name student-api-container -p 3000:3000 student-api:latest
+
+Test:
+
+http://localhost:3000/students
+
+Check running containers:
+
+docker ps
+
+View logs:
+
+docker logs student-api-container
+
+Stop the container:
+
+docker stop student-api-container
+
+Remove the stopped container:
+
+docker rm student-api-container
+
+If the container name already exists, remove it and run again:
+
+docker rm -f student-api-container
+docker run --name student-api-container -p 3000:3000 student-api:latest
+
+
+4. RUN WITH KUBERNETES
+----------------------
+
+Make sure Docker Desktop is running and Kubernetes is enabled.
+
+Build the image:
+
+docker build -f DockerFile -t student-api:latest .
+
+Apply the Deployment and Service:
+
+kubectl apply -f deployment.yaml
+
+Check the resources:
+
+kubectl get deployments
+kubectl get pods
+kubectl get services
+
+View Deployment details:
+
+kubectl describe deployment student-api
+
+View pod logs:
+
+kubectl logs -l app=student-api
+
+Access the API locally:
+
+kubectl port-forward service/student-api 3000:3000
+
+Keep port-forward running, then test:
+
+http://localhost:3000/students
+
+
+5. SCALE THE KUBERNETES DEPLOYMENT
+-----------------------------------
+
+Scale to 3 pods:
+
+kubectl scale deployment student-api --replicas=3
+
+Check the result:
+
+kubectl get deployment student-api
+kubectl get pods -l app=student-api
+
+Scale to 5 pods:
+
+kubectl scale deployment student-api --replicas=5
+
+Scale back to 2 pods:
+
+kubectl scale deployment student-api --replicas=2
+
+The Service automatically distributes traffic across the available pods.
+Scale the Deployment, not the Service:
+
+kubectl scale deployment student-api --replicas=4
+
+
+6. UPDATE AFTER CHANGING CODE
+-----------------------------
+
+Build a new image:
+
+docker build -f DockerFile -t student-api:latest .
+
+Restart Kubernetes pods:
+
+kubectl rollout restart deployment student-api
+
+Check rollout status:
+
+kubectl rollout status deployment student-api
+
+Check the new pods:
+
+kubectl get pods -l app=student-api
+
+
+7. REMOVE KUBERNETES RESOURCES
+------------------------------
+
+Delete the Deployment and Service:
+
+kubectl delete -f deployment.yaml
+
+Confirm removal:
+
+kubectl get deployments
+kubectl get services
+kubectl get pods
+
+
+8. COMMON TROUBLESHOOTING COMMANDS
+-----------------------------------
+
+Check Kubernetes client and cluster:
+
+kubectl version
+kubectl cluster-info
+
+Show all Kubernetes resources:
+
+kubectl get all
+
+Show pod events and errors:
+
+kubectl describe pod <pod-name>
+
+Open a shell inside a pod:
+
+kubectl exec -it <pod-name> -- sh
+
+If local port 3000 is busy, use another local port:
+
+kubectl port-forward service/student-api 3001:3000
+
+Then test:
+
+http://localhost:3001/students
